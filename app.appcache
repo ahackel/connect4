@@ -1,0 +1,8 @@
+CACHE MANIFEST
+# v.0.11
+index.html
+connect4.css
+lib/jquery-2.1.3.min.js
+lib/traceur-runtime.js
+out/js/connect4App.js
+img/connect4-board.png
