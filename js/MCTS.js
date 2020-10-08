@@ -1,9 +1,12 @@
+'use strict';
+
 // Monte Carlo Tree Search
 
 function indentString(indent) {
 	let s = "\n";
-	for (let i = 0; i < indent; i++)
+	for (let i = 0; i < indent; i++) {
 		s += "| ";
+	}
 	return s;
 }
 
@@ -48,7 +51,6 @@ export class MCTreeNode {
 		this.player = state.player;
 
 		this.totValue = 0;
-		this.epsilon = 1e-6;
 	}
 
 	selectChild() {
@@ -80,8 +82,9 @@ export class MCTreeNode {
 
 	treeToString(indent) {
 		let s = indentString(indent) + this;
-		for (let c of this.children)
+		for (let c of this.children){
 			s += c.treeToString(indent + 1);
+		}
 		return s;
 	}
 
@@ -109,7 +112,7 @@ export class MCTS {
 			let state = rootState.copy();
 
 			//select:
-			while (node.untriedMoves.length == 0 && node.children.length > 0) {
+			while (node.untriedMoves.length === 0 && node.children.length > 0) {
 				node = node.selectChild();
 				state.doMove(node.move);
 			}
@@ -123,21 +126,23 @@ export class MCTS {
 
 			//rollout:
 			while (true) {
-				let moves = state.getMoves();
-				if (moves == 0)
+				const moves = state.getMoves();
+				if (moves.length === 0) {
 					break;
+				}
 				state.doMove(moves[Math.floor(Math.random() * moves.length)]);
 			}
 
-				// Backpropagate
-			while (node != null) {
+			// Backpropagate
+			while (node) {
 				let result = state.getResult(node.player);
 				node.update(result);
 				node = node.parent;
 			}
 		}
-		if (rootNode.children.length == 0)
-		    return -1;
+		if (rootNode.children.length === 0) {
+			return -1;
+		}
 		rootNode.children.sort((a, b) => b.visits - a.visits);
 		//console.log(rootNode.bestTreeToString(0));
 		//console.log(rootNode);

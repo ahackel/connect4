@@ -1,12 +1,11 @@
+'use strict';
+
 import {Block} from './Block.js';
 import {Game} from './Game.js';
 import {GameState, MCTS} from './MCTS.js';
 
-"use strict";
-
 const EMPTY = -1;
 const RED = 0;
-const YELLOW = 1;
 const NUM_PLAYERS = 2;
 const DRAW = -1;
 const CONNECT_LENGTH = 4;
@@ -23,23 +22,27 @@ class Connect4GameState extends GameState{
 		this.player = player;
 		this.winner = null;
 		this.lastPosition = null;
-		for (let i=0; i<WIDTH * HEIGHT; i++)
+		for (let i=0; i<WIDTH * HEIGHT; i++) {
 			this.values.push(EMPTY);
+		}
 	}
 
 	get(x, y) {
-		if (x < 0 || y < 0 || x > WIDTH - 1 || y > HEIGHT - 1)
+		if (x < 0 || y < 0 || x > WIDTH - 1 || y > HEIGHT - 1) {
 			return null;
+		}
 		return this.values[x + y * WIDTH];
 	}
 
 	getColumnCount(x){
 		let count = 0;
 		for (let y = HEIGHT - 1; y >= -1; y--){
-			if (this.values[x + y * WIDTH] != EMPTY)
+			if (this.values[x + y * WIDTH] !== EMPTY) {
 				count++;
-			else
+			}
+			else {
 				return count;
+			}
 		}
 	}
 
@@ -50,7 +53,7 @@ class Connect4GameState extends GameState{
 
 	getMoves(){
 		let moves = [];
-		if (this.winner == null) {
+		if (this.winner === null) {
 			// Game is not over, so there are moves:
 			for (let x = 0; x < WIDTH; x++) {
 				if (this.isColumnFree(x)) {
@@ -89,17 +92,16 @@ class Connect4GameState extends GameState{
 		y -= dy * (CONNECT_LENGTH-1);
 
 		for (let i = 0; i < CONNECT_LENGTH * 2 - 1; i++) {
-			if (this.get(x + dx * i, y + dy * i) == this.player)
+			if (this.get(x + dx * i, y + dy * i) === this.player) {
 				count++;
-			else
+			}
+			else {
 				count = 0;
-			if (count == CONNECT_LENGTH) {
+			}
+			if (count === CONNECT_LENGTH) {
 				this.wonPosition = [];
 				for (let p = 0; p<CONNECT_LENGTH; p++){
-					this.wonPosition.push({
-						x: x + dx * (i - p),
-						y: y + dy * (i - p)
-					})
+					this.wonPosition.push({x: x + dx * (i - p), y: y + dy * (i - p)});
 				}
 				return true;
 			}
@@ -109,30 +111,32 @@ class Connect4GameState extends GameState{
 
 
 	getWinner(){
-		if (this.checkLine(1, 0)) return this.player;
-		if (this.checkLine(0, 1)) return this.player;
-		if (this.checkLine(1, 1)) return this.player;
-		if (this.checkLine(1, -1)) return this.player;
+		if (this.checkLine(1, 0) ||
+			this.checkLine(0, 1) ||
+			this.checkLine(1, 1) ||
+			this.checkLine(1, -1)) {
+			return this.player;
+		}
 
-		if (this.isFull())
-			return DRAW;
-		else
-			return null;
+		return this.isFull() ? DRAW : null;
 	}
 
 	getResult(player){
-		if (this.winner == player)
+		if (this.winner === player) {
 			return 1;
-		if (this.winner == DRAW || this.winner == null)
+		}
+		if (this.winner === DRAW || this.winner === null) {
 			return 0.5;
+		}
 		// other player wins:
 		return 0;
 	}
 
 	isFull(){
 		for (let v of this.values) {
-			if (v == EMPTY)
+			if (v === EMPTY) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -141,7 +145,7 @@ class Connect4GameState extends GameState{
 class Connect4Block extends Block {
 	constructor (game, x, y, color) {
 		let colorClass = COLOR_NAMES[color];
-		super(game, x, y, 1, 1, colorClass);
+		super(x, y, colorClass);
 		this.element.classList.add('start');
 		setTimeout(() => { this.element.classList.remove('start'); }, 0);
 	}
@@ -152,7 +156,7 @@ export class Connect4Game extends Game {
 		super(WIDTH, HEIGHT, blockSize);
 		this.gameOver = document.getElementById('gameover');
 		this.gameOver.style.display = 'none';
-		this.gameOver.addEventListener('pointerdown', e => {
+		this.gameOver.addEventListener('pointerdown', () => {
 			this.reset();
 		});
 		this.gameOverText = document.getElementById('gameover-text');
@@ -173,11 +177,13 @@ export class Connect4Game extends Game {
 
 	click(e){
 		// the player can only move if the last player has been the computer:
-		if (e.originalEvent.which != 1 || e.originalEvent.ctrlKey)
+		if (e.originalEvent.button !== 0 || e.originalEvent.ctrlKey) {
 			return;
+		}
 
-		if (this.over || this.gameState.player == RED)
-		    return;
+		if (this.over || this.gameState.player === RED) {
+			return;
+		}
 
 		if (this.placeBlock(e.x)) {
 			// reset timer:
@@ -193,7 +199,7 @@ export class Connect4Game extends Game {
 			return;
 		}
 
-		let move = MCTS.search(this.gameState, MAXITER); //, Math.random() * 100);
+		let move = MCTS.search(this.gameState, MAXITER);
 		this.placeBlock(move);
 	}
 
@@ -207,23 +213,8 @@ export class Connect4Game extends Game {
 		return false;
 	}
 
-	doMove(state, move, player, real){
-		let count = this.getColumnCount(state, move);
-		let y = null;
-		if (count < this.board.height) {
-			y = this.board.height - count - 1;
-			state.set(move, y, player);
-			this.lastMove.x = move;
-			this.lastMove.y = y;
-			this.lastMove.color = player;
-			if (real)
-				this.board.addBlock(new Connect4Block(this, move, y, player));
-		}
-		return y;
-	}
-
 	checkGameOver(){
-		if (this.gameState.winner != null) {
+		if (this.gameState.winner !== null) {
 
 			if (this.gameState.wonPosition) {
 				for (let p of this.gameState.wonPosition) {
@@ -232,7 +223,7 @@ export class Connect4Game extends Game {
 			}
 
 			let s = 'DRAW';
-			if (this.gameState.winner != DRAW){
+			if (this.gameState.winner !== DRAW){
 				let winningColor = COLOR_NAMES[this.gameState.winner];
 				s = winningColor + " wins.";
 				this.wins[this.gameState.winner]++;

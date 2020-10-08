@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 import {Board} from './Board.js';
 
@@ -37,6 +37,5 @@ export class Game {
 	click(e){}
 
 	won() {
-		console.log('Game won!');
 	}
 }

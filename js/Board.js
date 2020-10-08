@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 export class Board {
 	#blocks = [];
@@ -33,7 +33,7 @@ export class Board {
 	}
 
 	getBlockAt(x, y) {
-		return this.#blocks.find(block => block.x == x && block.y == y);
+		return this.#blocks.find(block => block.x === x && block.y === y);
 	}
 
 }
