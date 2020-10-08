@@ -1,7 +1,9 @@
-import {Connect4Game} from './Connect4Game';
+"use strict";
 
-var blockSize;
-var game;
+import {Connect4Game} from './Connect4Game.js';
+
+let blockSize;
+let game;
 
 function adjustSize(){
 	let portrait = window.innerWidth < window.innerHeight;
@@ -9,17 +11,22 @@ function adjustSize(){
 	let ny = window.innerHeight / 7;
 	let n = (portrait) ? nx : ny;
 	blockSize = Math.min(128, Math.floor(n));
-	$('html').css('font-size', blockSize);
+	document.documentElement.style.fontSize = blockSize + "px";
 	if (game != null)
 		game.board.blockSize = blockSize;
 	window.scrollTo(0, 0);
 }
 
-$(document).ready(function() {
+const ready = (callback) => {
+	if (document.readyState != "loading")
+		callback();
+	else
+		document.addEventListener("DOMContentLoaded", callback);
+};
+
+ready(() => {
 	adjustSize();
 	game = new Connect4Game(blockSize);
-
-	$(window).on('resize', adjustSize);
-
+	window.addEventListener("resize", adjustSize);
 	document.ontouchmove = function(e){ e.preventDefault(); }
 });

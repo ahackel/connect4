@@ -14,10 +14,7 @@ export class Rect {
 	}
 
 	contains(rect){
-		if (rect.x >= this.x && rect.x + rect.width <= this.x + this.width &&
-			rect.y >= this.y && rect.y + rect.height <= this.y + this.height)
-			return true;
-		else
-			return false;
+		return rect.x >= this.x && rect.x + rect.width <= this.x + this.width &&
+			rect.y >= this.y && rect.y + rect.height <= this.y + this.height;
 	}
 }

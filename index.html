@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <head>
     <title>Connect 4</title>
-    <script src="lib/jquery-2.1.3.min.js"></script>
-    <script src="lib/traceur-runtime.js"></script>
-    <script src="out/js/connect4App.js"></script>
+    <script type="module" src="js/connect4App.js"></script>
     <link rel='stylesheet' type='text/css' href='connect4.css' />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -11,7 +9,6 @@
 <body>
     <div id="container">
         <div class="wins red">0</div>
-		<div class="title">Connect 4</div>
         <div id='board'></div>
         <div class="wins yellow">0</div>
     </div>

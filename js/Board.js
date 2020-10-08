@@ -1,52 +1,39 @@
 "use strict";
 
 export class Board {
+	#blocks = [];
+	#element
+	width
+	height
+	blockSize
+
 	constructor(width, height, blockSize) {
 		this.blockSize = blockSize;
-		this.blocks = []; //new Set();
-		this.element = $('#board');
-		this.selectedBlock_ = null;
+		this.#element = document.getElementById('board');
 		this.setSize(width, height);
 	}
+
+	get element() { return this.#element; }
 
 	setSize(width, height) {
 		this.width = width;
 		this.height = height;
-		this.element.width(width + "em");
-		this.element.height(height + "em");
-	}
-
-	get bounds() {
-		return new Rect(0, 0, this.width, this.height);
-	}
-
-	get selectedBlock(){ return this.selectedBlock_; }
-	set selectedBlock(v) {
-		if (this.selectedBlock_ != null)
-			this.selectedBlock_.selected = false;
-		this.selectedBlock_ = v;
-		if (v != null)
-			v.selected = true;
+		this.#element.style.width = width + "em";
+		this.#element.style.height = height + "em";
 	}
 
 	clear(){
-		this.blocks = []; //.clear();
-		this.element.empty();
+		this.#blocks = [];
+		this.#element.innerHTML = "";
 	}
 
-	addBlock(block){
-		this.blocks.push(block); //add(block);
-		this.element.append(block.element);
+	addBlock(block) {
+		this.#blocks.push(block);
+		this.#element.appendChild(block.element);
 	}
 
-	getBlockAt(x, y){
-		//for (let block of this.blocks) {
-		for (var i=0; i<this.blocks.length; i++){
-			var block = this.blocks[i];
-			if (block.x == x && block.y == y)
-				return block;
-		}
-		return null;
+	getBlockAt(x, y) {
+		return this.#blocks.find(block => block.x == x && block.y == y);
 	}
 
 }

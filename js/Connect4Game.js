@@ -1,14 +1,12 @@
-import {Block} from './Block';
-import {Game} from './Game';
-import {GameState, MCTS} from './MCTS';
+import {Block} from './Block.js';
+import {Game} from './Game.js';
+import {GameState, MCTS} from './MCTS.js';
 
 "use strict";
 
 const EMPTY = -1;
 const RED = 0;
 const YELLOW = 1;
-const BLUE = 2;
-const GREEN = 3;
 const NUM_PLAYERS = 2;
 const DRAW = -1;
 const CONNECT_LENGTH = 4;
@@ -138,51 +136,33 @@ class Connect4GameState extends GameState{
 		}
 		return true;
 	}
-
-	toString(){
-		let s = "";
-		for (let i=0; i<this.values.length; i++) {
-			let v = this.values[i];
-			if (v == RED) s += 'X';
-			else if (v == BLUE) s += 'O';
-			else s += '.';
-			if (i % WIDTH == WIDTH-1)
-				s += "\n";
-		}
-		return s;
-	}
 }
-
-
 
 class Connect4Block extends Block {
 	constructor (game, x, y, color) {
 		let colorClass = COLOR_NAMES[color];
-		super(game, x, y, 1, 1, 'block ' + colorClass);
-		this.color = color;
-		this.element.addClass('start');
-		var that = this;
-		setTimeout(function(){
-			that.element.removeClass('start');
-		}, 0);
+		super(game, x, y, 1, 1, colorClass);
+		this.element.classList.add('start');
+		setTimeout(() => { this.element.classList.remove('start'); }, 0);
 	}
 }
 
 export class Connect4Game extends Game {
 	constructor(blockSize) {
-		var that = this;
-		this.gameOver = $('#gameover').hide().on('touchstart mousedown', function(){
-			that.reset();
-		});
-		this.gameOverText = $('#gameover-text');
 		super(WIDTH, HEIGHT, blockSize);
+		this.gameOver = document.getElementById('gameover');
+		this.gameOver.style.display = 'none';
+		this.gameOver.addEventListener('pointerdown', e => {
+			this.reset();
+		});
+		this.gameOverText = document.getElementById('gameover-text');
 		this.wins = [0, 0, 0, 0];
 		this.reset();
 	}
 
 	startTimer(){
 		if (!this.timer) {
-			this.timer = setInterval($.proxy(this.tick, this), 1000);
+			this.timer = setInterval(() => this.tick(), 1000);
 		}
 	}
 
@@ -247,7 +227,7 @@ export class Connect4Game extends Game {
 
 			if (this.gameState.wonPosition) {
 				for (let p of this.gameState.wonPosition) {
-					this.board.getBlockAt(p.x, p.y).element.addClass('won');
+					this.board.getBlockAt(p.x, p.y).element.classList.add('won');
 				}
 			}
 
@@ -257,10 +237,11 @@ export class Connect4Game extends Game {
 				s = winningColor + " wins.";
 				this.wins[this.gameState.winner]++;
 
-				$('.wins.' + winningColor).text(this.wins[this.gameState.winner]);
+				document.getElementsByClassName('wins.' + winningColor)
+					.innerText = this.wins[this.gameState.winner];
 			}
-			this.gameOverText.text(s.toUpperCase());
-			this.gameOver.show();
+			this.gameOverText.innerText = s.toUpperCase();
+			this.gameOver.style.display = 'block';
 			this.over = true;
 			return true;
 		}
@@ -269,7 +250,7 @@ export class Connect4Game extends Game {
 
 	reset(){
 		super.reset();
-		this.gameOver.fadeOut(500);
+		this.gameOver.style.display = 'none';
 		this.gameState = new Connect4GameState(Math.floor(Math.random() * NUM_PLAYERS));
 		this.startTimer();
 	}
